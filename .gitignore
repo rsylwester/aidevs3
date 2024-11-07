@@ -1,0 +1,5 @@
+.env
+.DS_Store
+.idea/
+AiDevs3.iml
+__pycache__/
