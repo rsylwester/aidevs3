@@ -2,3 +2,4 @@ langchain-openai==0.2.6
 requests
 beautifulsoup4
 playwright
+pydantic==2.9.2

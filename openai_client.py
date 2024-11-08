@@ -20,3 +20,5 @@ class OpenAIClient:
             messages.append({"role": "system", "content": system_message})
         messages.append({"role": "user", "content": question})
         return self.llm.invoke(messages)
+
+
