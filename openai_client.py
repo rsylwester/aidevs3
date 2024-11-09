@@ -17,8 +17,9 @@ class OpenAIClient:
     def ask_question(self, question: str, system_message: str = None) -> str:
         messages = []
         if system_message:
+            system_message += "Please provide a direct answer without any prefixes like 'System:'."
             messages.append({"role": "system", "content": system_message})
         messages.append({"role": "user", "content": question})
-        return self.llm.invoke(messages)
+        return self.llm.invoke(messages).strip()
 
 

@@ -3,3 +3,5 @@ requests
 beautifulsoup4
 playwright
 pydantic==2.9.2
+fastapi
+python-dotenv

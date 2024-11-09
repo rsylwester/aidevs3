@@ -6,3 +6,4 @@ load_dotenv()
 
 # Retrieve the API key
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+AIDEVS_API_KEY = os.getenv('AIDEVS_API_KEY')
