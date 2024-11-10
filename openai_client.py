@@ -5,12 +5,15 @@ from env import OPENAI_API_KEY
 
 
 class OpenAIClient:
-    def __init__(self):
+    def __init__(self, model=None):
         # Load environment variables from .env file
         load_dotenv()
         # Retrieve the API key
         if not OPENAI_API_KEY:
             raise ValueError("OpenAI API key not found. Please set it in the .env file.")
+
+        if model:
+            self.llm = OpenAI(openai_api_key=OPENAI_API_KEY, model=model)
 
         self.llm = OpenAI(openai_api_key=OPENAI_API_KEY)
 
@@ -21,5 +24,3 @@ class OpenAIClient:
             messages.append({"role": "system", "content": system_message})
         messages.append({"role": "user", "content": question})
         return self.llm.invoke(messages).strip()
-
-
