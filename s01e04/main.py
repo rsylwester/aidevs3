@@ -1,12 +1,3 @@
-from typing import List, Optional, Any
-
-import requests
-from env import AIDEVS_API_KEY
-from logger import logger
-from openai_client import OpenAIClient
-from pydantic import BaseModel, Field
-from requests import Response
-
 # SOLUTION 1
 """
 Output following result by replacing variables. Output should contain JSON format.
@@ -37,9 +28,11 @@ output:
 # SOLUTION 2 - DRAFT
 # openai_client = OpenAIClient(model="gpt-4o-mini")
 
-# BOARD = """o,x,o,o,o,o
-# o,o,o,x,o,o
-# o,x,o,x,o,o
-# r,x,o,o,o,g"""
-
+# BOARD =
+# [
+# [o,x,o,o,o,o],
+# [o,o,o,x,o,o],
+# [o,x,o,x,o,o],
+# [r,x,o,o,o,g]
+# ]
 # logger.info(verification_response)
