@@ -1,7 +1,7 @@
 from typing import List, Optional, Any
 
 import requests
-from env import AIDEVS_API_KEY, REPORT_ANSWER_URL
+from env import AIDEVS_API_KEY, REPORT_ANSWER_URL, S01E03_URL_DATA
 from logger import logger
 from openai_client import OpenAIClient
 from pydantic import BaseModel, Field
@@ -31,8 +31,6 @@ class CalibrationData(BaseModel):
     copyright: str
     test_data: List[TestData] = Field(..., alias='test-data')
 
-
-URL = f"https://centrala.ag3nts.org/data/{AIDEVS_API_KEY}/json.txt"
 
 openai_client = OpenAIClient()
 
@@ -71,7 +69,7 @@ def fix_calibration_data(calibration_data: CalibrationData):
     calibration_data.apikey = AIDEVS_API_KEY
 
 
-calibration_data: CalibrationData = retrieve_data(URL)
+calibration_data: CalibrationData = retrieve_data(S01E03_URL_DATA)
 fix_calibration_data(calibration_data)
 
 logger.info(f"[Sending answer]")

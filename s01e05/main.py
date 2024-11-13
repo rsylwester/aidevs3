@@ -1,19 +1,10 @@
 from typing import Any
 
 import requests
-from env import AIDEVS_API_KEY, LLAMA2_CLOUDFLARE_API_URL, REPORT_ANSWER_URL
+from aidevs3 import Answer
+from env import AIDEVS_API_KEY, LLAMA2_CLOUDFLARE_API_URL, REPORT_ANSWER_URL, S01E05_URL_DATA
 from logger import logger
-from pydantic import BaseModel
 from requests import Response
-
-
-class Answer(BaseModel):
-    task: str
-    apikey: str
-    answer: Any
-
-
-URL = f"https://centrala.ag3nts.org/data/{AIDEVS_API_KEY}/cenzura.txt"
 
 SYSTEM_MESSAGE = """
 You are tasked with anonymizing personal information in a given text. Your goal is to protect individuals' privacy by replacing sensitive data with word CENZURA.
@@ -105,7 +96,7 @@ def retrieve_data(url: str) -> Any:
 
 #### main logic
 
-original_sentence: str = retrieve_data(URL)
+original_sentence: str = retrieve_data(S01E05_URL_DATA)
 anonymized_sentence: dict = ask_llama(question=original_sentence, system_message=SYSTEM_MESSAGE).get('response')
 logger.info(f"\nbefore: {original_sentence}\nafter: {anonymized_sentence}")
 

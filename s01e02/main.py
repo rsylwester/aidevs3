@@ -1,4 +1,5 @@
 import requests
+from env import S01E02_VERIFY_URL
 from pydantic import BaseModel
 
 from logger import logger
@@ -10,12 +11,11 @@ class Message(BaseModel):
     msgID: int
 
 
-WEBSITE_URL = "https://xyz.ag3nts.org/verify"
 INITIAL_MESSAGE = Message(text="READY", msgID="0")
 
 
 def send_message(message: Message) -> Message:
-    response = requests.post(WEBSITE_URL, json=message.model_dump())
+    response = requests.post(S01E02_VERIFY_URL, json=message.model_dump())
     return Message.model_validate(response.json())
 
 
