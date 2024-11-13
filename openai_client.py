@@ -8,13 +8,13 @@ from openai import ChatCompletion
 
 
 class OpenAIClient:
-    def __init__(self, model: str = "gpt-4o"):
+    def __init__(self, model_name: str = "gpt-4o"):
         # Load environment variables from .env file
         # Retrieve the API key
         if not OPENAI_API_KEY:
             raise ValueError("OpenAI API key not found. Please set it in the .env file.")
 
-        self._model_name: str = model
+        self._model_name: str = model_name
         self._client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
     def transcribe_audio(self, audio_file_path: str) -> str:
@@ -34,7 +34,7 @@ class OpenAIClient:
 
         logger.info(f"Saved transcript to {transcript_path.name}")
 
-    def answer_with_image(self, image_file_path: Path, question: str, system_message: str = None) -> str:
+    def ask_with_image(self, image_file_path: Path, question: str, system_message: str = None) -> str:
         """Answer a question based on an attached image using OpenAI's new API format"""
 
         # Encode the image in base64
@@ -76,3 +76,20 @@ class OpenAIClient:
         )
 
         return response.choices[0].message.content
+
+    def generate_iamge(self, prompt: str, model_name: str = "dall-e-3") -> str:
+
+        # Generate the image
+        response = self._client.images.generate(
+            model=model_name,
+            prompt=prompt,
+            n=1,
+            size="1024x1024",
+            response_format="url"
+        )
+
+        # Retrieve the image URL
+        image_url = response.data[0].url
+        logger.info(f"Generated image URL: {image_url}")
+
+        return image_url

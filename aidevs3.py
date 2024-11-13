@@ -1,14 +1,15 @@
 from typing import Any
 
 import requests
-from env import REPORT_ANSWER_URL
+from env import REPORT_ANSWER_URL, AIDEVS_API_KEY
 from logger import logger
 from pydantic import BaseModel
+from pydantic import Field
 
 
 class Answer(BaseModel):
     task: str
-    apikey: str
+    apikey: str = Field(default=AIDEVS_API_KEY)
     answer: Any
 
 

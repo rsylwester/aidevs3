@@ -76,7 +76,7 @@ fix_calibration_data(calibration_data)
 
 logger.info(f"[Sending answer]")
 
-my_answer = Answer(task="JSON", apikey=AIDEVS_API_KEY, answer=calibration_data)
+my_answer = Answer(task="JSON", answer=calibration_data)
 verification_response = send_answer(my_answer)
 
 logger.info(verification_response)

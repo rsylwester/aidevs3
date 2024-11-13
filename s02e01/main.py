@@ -5,14 +5,13 @@ import download_utils
 import utils
 from aidevs3 import Answer, send_answer
 from env import S02E01_URL_DATA, AIDEVS_API_KEY, OPENAI_API_KEY
-from langchain_client import LangchainClient
 from logger import logger
 from openai_client import OpenAIClient
 from utils import get_tag_value
 
 DATA_DIR = './data'
 
-openai_client = OpenAIClient(model="gpt-4o")
+openai_client = OpenAIClient(model_name="gpt-4o")
 
 system_context = ""
 
@@ -100,7 +99,7 @@ transcription_files = list_transcription_files(Path(DATA_DIR))
 
 # download audio files and transcribe if not yet transcribed
 if not transcription_files:
-    file_path: str = download_utils.download_zip(S02E01_URL_DATA, DATA_DIR)
+    file_path: str = download_utils.download_file(S02E01_URL_DATA, DATA_DIR)
     audio_files: List[str] = utils.unzip_file(file_path, ['*.mp3', '*.wav', '*.m4a', '*.ogg'])
 
     for file in audio_files:
@@ -112,8 +111,7 @@ for file in transcription_files:
 
 logger.info(system_context)
 
-langchain_client = LangchainClient(api_key=OPENAI_API_KEY, model_name="gpt-4o", system_message=system_context)
-model_answer: str = langchain_client.ask_question(question=question)
+model_answer: str = openai_client.ask_question(question=question, system_message=system_context)
 
 logger.info(f"Model's answer: {model_answer}")
 
