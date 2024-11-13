@@ -1,10 +1,14 @@
+import base64
+from pathlib import Path
+
 import openai
 from env import OPENAI_API_KEY
 from logger import logger
+from openai import ChatCompletion
 
 
 class OpenAIClient:
-    def __init__(self, model: str = None):
+    def __init__(self, model: str = "gpt-4o"):
         # Load environment variables from .env file
         # Retrieve the API key
         if not OPENAI_API_KEY:
@@ -29,3 +33,46 @@ class OpenAIClient:
             f.write(transcript.text)
 
         logger.info(f"Saved transcript to {transcript_path.name}")
+
+    def answer_with_image(self, image_file_path: Path, question: str, system_message: str = None) -> str:
+        """Answer a question based on an attached image using OpenAI's new API format"""
+
+        # Encode the image in base64
+        with open(image_file_path, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant." if not system_message else system_message},
+            {"role": "user", "content": [
+                {"type": "text", "text": question},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"},
+                }
+            ]
+             }
+        ]
+
+        response: ChatCompletion = self._client.chat.completions.create(
+            model=self._model_name,
+            messages=messages,
+        )
+
+        return response.choices[0].message.content
+
+    def ask_question(self, question: str, system_message: str = None, model_name: str = None) -> str:
+        messages = []
+
+        if system_message:
+            messages.append({"role": "system", "content": system_message})
+
+        messages.append({"role": "user", "content": question})
+
+        response = self._client.chat.completions.create(
+            model=model_name if model_name else self._model_name,
+            messages=messages,
+            temperature=1.0,
+            stream=False
+        )
+
+        return response.choices[0].message.content
