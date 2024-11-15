@@ -1,4 +1,5 @@
 import os
+import pickle
 import re
 import zipfile
 from pathlib import Path
@@ -38,9 +39,10 @@ def unzip_file(zip_path: str, extensions: List[str] = None) -> list:
         for ext in extensions:
             files.extend(list(Path(dir).glob(ext)))
     else:
-        return list(Path(zip_path).iterdir())
+        return list(Path(dir).iterdir())
 
     return files
+
 
 def get_tag_value(text: str, tag: str) -> str:
     pattern = f"<{tag}>(.*?)</{tag}>"
@@ -48,3 +50,30 @@ def get_tag_value(text: str, tag: str) -> str:
     if not match:
         raise ValueError(f"No {tag} tag found in text")
     return match.group(1)
+
+
+def filter_files_by_extension(file_paths: List[Path], extensions: list) -> List[Path]:
+    extensions = {ext if ext.startswith('.') else f'.{ext}' for ext in extensions}
+    return [file for file in file_paths if file.suffix in extensions]
+
+
+def read_text_file(text_filepath: Path):
+    with open(text_filepath, 'r', encoding='utf-8') as file:
+        text = file.read()
+        return text
+
+
+SERIALIZED_FILENAME = "object.pickle"
+
+
+def serialize(object):
+    # Serialize and save to file
+    with open(SERIALIZED_FILENAME, 'wb') as f:
+        pickle.dump(object, f)
+
+
+def deserialize():
+    # Read from file and deserialize
+    with open(SERIALIZED_FILENAME, 'rb') as f:
+        loaded_object = pickle.load(f)
+        return loaded_object

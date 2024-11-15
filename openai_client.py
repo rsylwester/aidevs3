@@ -17,10 +17,8 @@ class OpenAIClient:
         self._model_name: str = model_name
         self._client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
-    def transcribe_audio(self, audio_file_path: str) -> str:
+    def transcribe_audio(self, audio_file_path: Path, save=True) -> str:
         """Transcribe audio file using OpenAI API"""
-
-        transcript_path = audio_file_path.with_suffix('.txt')
 
         with open(audio_file_path, "rb") as audio_file:
             transcript = self._client.audio.transcriptions.create(
@@ -28,11 +26,16 @@ class OpenAIClient:
                 file=audio_file
             )
 
-        # Save transcript with same name as audio file
-        with open(transcript_path, "w", encoding="utf-8") as f:
-            f.write(transcript.text)
+        if save:
+            transcript_path = audio_file_path.with_suffix('.txt')
+            # Save transcript with same name as audio file
+            with open(transcript_path, "w", encoding="utf-8") as f:
+                f.write(transcript.text)
 
-        logger.info(f"Saved transcript to {transcript_path.name}")
+            logger.info(f"Saved transcript to {transcript_path.name}")
+            return transcript.text
+        else:
+            return transcript.text
 
     def ask_with_image(self, image_file_path: Path, question: str, system_message: str = None) -> str:
         """Answer a question based on an attached image using OpenAI's new API format"""
