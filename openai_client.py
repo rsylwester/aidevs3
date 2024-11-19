@@ -104,7 +104,7 @@ class OpenAIClient:
             logger.error(f"Error asking question with image {image_file_path}: {e}", exc_info=True)
             raise
 
-    def ask_question(self, question: str, system_message: str = None, model_name: str = None) -> str:
+    def ask_question(self, question: str, system_message: str = None, model_name: str = None, temperature=1) -> str:
         logger.debug(f"Asking question: {question}")
         try:
             messages = []
@@ -117,7 +117,7 @@ class OpenAIClient:
             response = self._client.chat.completions.create(
                 model=model_name if model_name else self._model_name,
                 messages=messages,
-                temperature=1.0,
+                temperature=temperature,
                 stream=False
             )
             logger.info(f"Received response for question: {question}")

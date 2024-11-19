@@ -77,3 +77,36 @@ def deserialize():
     with open(SERIALIZED_FILENAME, 'rb') as f:
         loaded_object = pickle.load(f)
         return loaded_object
+
+
+# Read files from a directory
+def read_files_from_directory(directory):
+    data = {}
+    for root, _, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            with open(file_path, "r", encoding="utf-8") as f:
+                data[file] = f.read()
+    return data
+
+
+def read_files_from_paths(paths: List[Path]) -> dict:
+    data = {}
+    for file_path in paths:
+        file_path = Path(file_path)  # Ensure it's a Path object
+        if file_path.is_file():
+            with file_path.open("r", encoding="utf-8") as f:
+                data[file_path.name] = f.read()
+        else:
+            print(f"Warning: {file_path} is not a valid file.")
+    return data
+
+def normalize_whitespace(text: str) -> str:
+    # Remove all tabs
+    text = text.replace("\t", "")
+    # Replace multiple spaces with a single space
+    text = re.sub(r" +", " ", text)
+    # Remove trailing spaces before newlines
+    text = re.sub(r" +(\r?\n)", r"\1", text)
+    # Strip leading and trailing whitespace from the whole text
+    return text.strip()
