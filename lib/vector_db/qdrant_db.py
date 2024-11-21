@@ -1,8 +1,10 @@
-from openai_client import OpenAIClient
-from .vector_db import VectorDb
+from typing import List, Dict, Any
+
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import VectorParams, PointStruct
-from typing import List, Dict, Any
+
+from openai_client import OpenAIClient
+from .vector_db import VectorDb
 
 openai_client = OpenAIClient()
 
@@ -16,7 +18,7 @@ class QdrantDb(VectorDb):
         """
         self.client = QdrantClient(url=url)
 
-    def initialize_collection(self, collection_name: str, vector_size: int, distance_metric: str = "cosine",
+    def initialize_collection(self, collection_name: str, vector_size: int = 1536, distance_metric: str = "cosine",
                               recreate=False) -> None:
         """
         Initialize a collection in Qdrant.
@@ -44,6 +46,20 @@ class QdrantDb(VectorDb):
             return any(collection.name == collection_name for collection in collections)
         except Exception as e:
             print(f"Error checking collection existence: {e}")
+            return False
+
+    def is_collection_empty(self, collection_name: str) -> bool:
+        """
+        Check if a Qdrant collection is not empty.
+
+        :param collection_name: Name of the collection to check.
+        :return: True if the collection is not empty, False otherwise.
+        """
+        try:
+            collection_info = self.client.get_collection(collection_name)
+            return collection_info.points_count == 0
+        except Exception as e:
+            print(f"Error checking if collection is not empty: {e}")
             return False
 
     def store_vectors(self, collection_name: str, vectors: List[Dict[str, Any]]) -> None:
@@ -92,6 +108,7 @@ class QdrantDb(VectorDb):
 
         # Format the results to include content and relevance score
         return [
-            {"content": result["payload"].get("content", ""), "score": result["score"]}
+            {"content": result["payload"].get("content", ""), "filename": result["payload"].get("filename", ""),
+             "score": result["score"]}
             for result in results
         ]

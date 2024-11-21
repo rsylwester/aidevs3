@@ -1,10 +1,10 @@
 import os
 import pickle
 import re
-import zipfile
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
+import pyzipper
 from bs4 import BeautifulSoup
 
 
@@ -25,23 +25,37 @@ def extract_human_readable_text(html: str) -> str:
     return human_readable_text
 
 
-def unzip_file(zip_path: str, extensions: List[str] = None) -> list:
-    """Unzip file and return list of paths to extracted audio files"""
-    dir = os.path.dirname(zip_path)
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(dir)
+def unzip_file(zip_path: str, extensions: List[str] = None, password: Optional[str] = None,
+               extract_to: Optional[str] = None) -> List[Path]:
+    # Set the extraction directory
+    if extract_to:
+        extract_path = Path(extract_to)
+    else:
+        extract_path = Path(os.path.dirname(zip_path))
 
+    # Ensure the extraction directory exists
+    extract_path.mkdir(parents=True, exist_ok=True)
+
+    extracted_files = []
+
+    with pyzipper.AESZipFile(zip_path, 'r') as zip_ref:
+        if password:
+            zip_ref.pwd = password.encode('utf-8')
+
+        # Extract all files
+        zip_ref.extractall(extract_path)
+
+    # Remove the original ZIP file
     os.remove(zip_path)
 
-    # Get all audio files
-    files = []
+    # Filter files by extensions if provided
     if extensions:
         for ext in extensions:
-            files.extend(list(Path(dir).glob(ext)))
+            extracted_files.extend(extract_path.glob(ext))
     else:
-        return list(Path(dir).iterdir())
+        extracted_files = list(extract_path.iterdir())
 
-    return files
+    return extracted_files
 
 
 def get_tag_value(text: str, tag: str) -> str:
@@ -100,6 +114,7 @@ def read_files_from_paths(paths: List[Path]) -> dict:
         else:
             print(f"Warning: {file_path} is not a valid file.")
     return data
+
 
 def normalize_whitespace(text: str) -> str:
     # Remove all tabs

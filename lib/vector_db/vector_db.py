@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
+
 class VectorDb(ABC):
     """
     Abstract base class for a Vector Database.
@@ -76,5 +77,14 @@ class VectorDb(ABC):
 
         :param collection_name: Name of the collection to check.
         :return: True if the collection exists, False otherwise.
+        """
+        pass
+
+    def is_collection_empty(self, collection_name: str) -> bool:
+        """
+        Check if a Qdrant collection is not empty.
+
+        :param collection_name: Name of the collection to check.
+        :return: True if the collection is not empty, False otherwise.
         """
         pass
