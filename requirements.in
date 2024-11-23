@@ -1,0 +1,15 @@
+beautifulsoup4
+openai
+Pillow
+playwright
+pydantic
+python-dotenv
+pytidylib
+pyzipper
+qdrant_client
+requests
+singleton_decorator
+transformers
+torch
+torchvision
+torchaudio
