@@ -80,17 +80,23 @@ def read_text_file(text_filepath: Path):
 SERIALIZED_FILENAME = "object.pickle"
 
 
-def serialize(object):
+def serialize(object, filepath=None):
     # Serialize and save to file
-    with open(SERIALIZED_FILENAME, 'wb') as f:
+    filepath = filepath if filepath else SERIALIZED_FILENAME
+    with open(filepath, 'wb') as f:
         pickle.dump(object, f)
 
 
-def deserialize():
+def deserialize(filepath=None):
     # Read from file and deserialize
-    with open(SERIALIZED_FILENAME, 'rb') as f:
-        loaded_object = pickle.load(f)
-        return loaded_object
+    filepath = filepath if filepath else SERIALIZED_FILENAME
+
+    if does_file_exist(filepath):
+        with open(filepath, 'rb') as f:
+            loaded_object = pickle.load(f)
+            return loaded_object
+
+    return None
 
 
 # Read files from a directory
@@ -125,3 +131,45 @@ def normalize_whitespace(text: str) -> str:
     text = re.sub(r" +(\r?\n)", r"\1", text)
     # Strip leading and trailing whitespace from the whole text
     return text.strip()
+
+
+def is_directory_empty(directory_path: str) -> bool:
+    directory = Path(directory_path)
+
+    # Check if the path is a directory and has no files or subdirectories
+    if directory.is_dir():
+        return not any(directory.iterdir())
+
+    # If the path is not a directory, treat it as empty
+    return True
+
+
+def does_directory_exist(directory_path: str) -> bool:
+    """
+    Checks if a directory exists.
+
+    :param directory_path: Path to the directory to check.
+    :return: True if the directory exists, False otherwise.
+    """
+    return Path(directory_path).is_dir()
+
+
+def does_file_exist(file_path: str) -> bool:
+    """
+    Checks if a file exists.
+
+    :param file_path: Path to the file to check.
+    :return: True if the files exists, False otherwise.
+    """
+    return Path(file_path).is_file()
+
+
+def get_filename_from_url(url: str) -> str:
+    """
+    Extracts the filename from a given URL.
+
+    :param url: The URL to extract the filename from.
+    :return: The filename as a string.
+    """
+    # Parse the URL path and get the filename
+    return Path(url).name

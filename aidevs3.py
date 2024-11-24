@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any
 
 import requests
@@ -13,12 +14,21 @@ class Answer(BaseModel):
     answer: Any
 
 
-def send_answer(answer: Answer) -> any:
+@dataclass
+class Response:
+    code: int
+    message: str
+
+
+def send_answer(answer: Answer) -> Response:
     answer_json = answer.model_dump_json(by_alias=True)
     response = requests.post(REPORT_ANSWER_URL, data=answer_json)
 
     logger.info(f"Sent answer in json:\n: {answer_json}")
 
     response_json = response.json()
+    api_response = Response(code=response_json.get("code"), message=response_json.get("message"))
 
     logger.info(f"Received response in json:\n: {response_json}")
+
+    return api_response

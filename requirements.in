@@ -13,3 +13,6 @@ transformers
 torch
 torchvision
 torchaudio
+names-dataset
+pandas
+unidecode
