@@ -16,3 +16,4 @@ torchaudio
 names-dataset
 pandas
 unidecode
+neo4j

@@ -1,13 +1,14 @@
 services:
   neo4j:
     image: neo4j:latest
+    container_name: neo4j
     volumes:
-      - /$HOME/neo4j/logs:/logs
-      - /$HOME/neo4j/config:/config
-      - /$HOME/neo4j/data:/data
-      - /$HOME/neo4j/plugins:/plugins
+      - /$HOME/docker/neo4j/logs:/logs
+      - /$HOME/docker/neo4j/config:/config
+      - /$HOME/docker/neo4j/data:/data
+      - /$HOME/docker/neo4j/plugins:/plugins
     environment:
-      - NEO4J_AUTH=neo4j/neo4j
+      - NEO4J_AUTH=neo4j/neo4jneo4j
     ports:
       - "7474:7474"
       - "7687:7687"
