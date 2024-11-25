@@ -32,18 +32,19 @@ def save_relations_to_csv_file(relations: dict, path):
 
 
 class Neo4jHandler:
-    def __init__(self, uri, user, password):
+    def __init__(self, uri, user, password, database="neo4j"):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
-        logger.info("Connected to Neo4j")
+        self.database = database
+        logger.info("Connected to Neo4j (Database: %s)", self.database)
 
     def close(self):
         self.driver.close()
         logger.info("Connection to Neo4j closed")
 
     def run_query(self, query, parameters=None):
-        with self.driver.session() as session:
+        with self.driver.session(database=self.database) as session:
             session.run(query, parameters or {})
-            logger.info("Executed query: %s", query)
+            logger.info("Executed query on database '%s': %s", self.database, query)
 
     def ensure_unique_constraints(self):
         """
@@ -64,9 +65,8 @@ class Neo4jHandler:
         MERGE (u2:Person {name: $user2})
         MERGE (u1)-[:KNOWS]->(u2);
         """
-        with self.driver.session() as session:
-            session.run(query, {"user1": user1, "user2": user2})
-            logger.info("Created relationship: %s KNOWS %s", user1, user2)
+        self.run_query(query, {"user1": user1, "user2": user2})
+        logger.info("Created relationship: %s KNOWS %s", user1, user2)
 
     def find_shortest_path(self, start_name, end_name):
         query = """
@@ -74,7 +74,7 @@ class Neo4jHandler:
         MATCH path = shortestPath((start)-[*]-(end))
         RETURN [n IN nodes(path) | n.name] AS path;
         """
-        with self.driver.session() as session:
+        with self.driver.session(database=self.database) as session:
             result = session.run(query, {"start_name": start_name, "end_name": end_name})
             record = result.single()
             if record:

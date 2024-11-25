@@ -18,6 +18,7 @@ SELECT_USERS = '''
         users u2 ON c.user2_id = u2.id;
 '''
 
+
 neo4j_handler = Neo4jHandler("bolt://localhost:7687", "neo4j", "neo4jneo4j")
 neo4j_handler.ensure_unique_constraints()
 
