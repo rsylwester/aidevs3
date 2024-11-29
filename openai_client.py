@@ -7,9 +7,10 @@ import openai
 import requests
 from PIL import Image
 from openai import ChatCompletion
+from openai.types.audio.transcription import Transcription
 from singleton_decorator import singleton
 from transformers import CLIPProcessor, CLIPModel
-from openai.types.audio.transcription import Transcription
+
 from env import OPENAI_API_KEY
 from logger import logger
 
@@ -77,11 +78,17 @@ class OpenAIClient:
             logger.error(f"Error transcribing audio from {audio_source}: {e}", exc_info=True)
             raise
 
-    def ask_with_image(self, image_file_path: Path, question: str, system_message: str = None) -> str:
+    def ask_with_image(self, question: str, system_message: str = None, image_file_path: Path = None,
+                       image_file_url: str = None) -> str:
         logger.debug(f"Asking question with image {image_file_path}")
         try:
-            with open(image_file_path, "rb") as image_file:
-                encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+
+            image_data = ""
+            if image_file_path:
+                with open(image_file_path, "rb") as image_file:
+                    image_data = f"data:image/jpeg;base64,{base64.b64encode(image_file.read()).decode("utf-8")}"
+            elif image_file_url:
+                image_data = image_file_url
 
             messages = [
                 {"role": "system", "content": "You are a helpful assistant." if not system_message else system_message},
@@ -89,7 +96,7 @@ class OpenAIClient:
                     {"type": "text", "text": question},
                     {
                         "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"},
+                        "image_url": {"url": image_data},
                     }
                 ]}
             ]
@@ -124,6 +131,29 @@ class OpenAIClient:
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f"Error asking question: {question}: {e}", exc_info=True)
+            raise
+
+    def json_mode(self, prompt: str = None, system_message: str = None, model_name: str = None, temperature=1,
+                  josn_schema=None) -> str:
+        logger.debug(f"Asking question: {prompt}")
+        try:
+            messages = []
+
+            if system_message:
+                messages.append({"role": "system", "content": system_message})
+
+            messages.append({"role": "user", "content": prompt})
+
+            response = self._client.chat.completions.create(
+                model=model_name if model_name else self._model_name,
+                messages=messages,
+                temperature=temperature,
+                response_format={"type": "json_schema", "json_schema": josn_schema}
+            )
+            logger.info(f"Received response for question: {prompt}")
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Error asking question: {prompt}: {e}", exc_info=True)
             raise
 
     def generate_image(self, prompt: str, model_name: str = "dall-e-3") -> str:

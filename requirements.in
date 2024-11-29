@@ -1,5 +1,6 @@
 beautifulsoup4
 openai
+numpy
 Pillow
 playwright
 pydantic
@@ -17,3 +18,5 @@ names-dataset
 pandas
 unidecode
 neo4j
+langchain
+langchain-community
