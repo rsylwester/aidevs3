@@ -173,3 +173,22 @@ def get_filename_from_url(url: str) -> str:
     """
     # Parse the URL path and get the filename
     return Path(url).name
+
+
+def replace_filename_in_url(url: str, new_filename: str) -> str:
+    # Split the URL into path and filename
+    parts = url.rsplit('/', 1)
+    # Replace the old filename with the new one
+    return f"{parts[0]}/{new_filename}"
+
+
+def add_suffix(image_path: str, suffix: str) -> str:
+    """
+    Add a suffix before the file extension for both image URLs and filenames.
+
+    :param image_path: The full URL or filename of the image.
+    :param suffix: The suffix to add (e.g., '-small').
+    :return: Modified image URL or filename with the suffix.
+    """
+    base, ext = image_path.rsplit('.', 1)  # Split into base and extension
+    return f"{base}{suffix}.{ext}"

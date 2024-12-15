@@ -1,6 +1,5 @@
 beautifulsoup4
 openai
-numpy
 Pillow
 playwright
 pydantic

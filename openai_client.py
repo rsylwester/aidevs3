@@ -1,7 +1,8 @@
 import base64
 from numbers import Number
 from pathlib import Path
-from typing import List
+from statistics import median
+from typing import List, Any
 
 import openai
 import requests
@@ -111,6 +112,49 @@ class OpenAIClient:
             logger.error(f"Error asking question with image {image_file_path}: {e}", exc_info=True)
             raise
 
+    def ask_with_images(self, question: str = None, system_message: str = None, image_file_paths: List[Path] = None,
+                        image_file_urls: List[str] = None) -> str:
+        logger.debug(f"Asking question openai with images")
+        try:
+
+            image_data: List[str] = []
+
+            if image_file_paths:
+                for image_file_path in image_file_paths:
+                    with open(image_file_path, "rb") as image_file:
+                        image_data.append(
+                            f"data:image/jpeg;base64,{base64.b64encode(image_file.read()).decode("utf-8")}")
+            elif image_file_urls:
+                for image_file_url in image_file_urls:
+                    image_data.append(image_file_url)
+
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant." if not system_message else system_message},
+            ]
+
+            user_content = {"role": "user", "content": [
+            ]}
+
+            if question:
+                user_content['content'].append({"type": "text", "text": question})
+
+            if image_data:
+                for image in image_data:
+                    user_content["content"].append({
+                        "type": "image_url",
+                        "image_url": {"url": image},
+                    })
+
+            response: ChatCompletion = self._client.chat.completions.create(
+                model=self._model_name,
+                messages=messages,
+            )
+            logger.info(f"Received response: {response.choices[0].message}")
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Error asking question with image: {e}", exc_info=True)
+            raise
+
     def ask_question(self, question: str, system_message: str = None, model_name: str = None, temperature=1) -> str:
         logger.debug(f"Asking question: {question}")
         try:
@@ -134,26 +178,58 @@ class OpenAIClient:
             raise
 
     def json_mode(self, prompt: str = None, system_message: str = None, model_name: str = None, temperature=1,
-                  josn_schema=None) -> str:
-        logger.debug(f"Asking question: {prompt}")
+                  response_format=None, image_file_url: str = None, image_file_path: str = None,
+                  request_logging=False) -> Any:
+
+        if request_logging:
+            logger.info(f"Preparing to send prompt to OpenAI. Prompt: {prompt}, System Message: {system_message}, "
+                        f"Model: {model_name if model_name else self._model_name}, Temperature: {temperature}, "
+                        f"JSON Schema: {response_format}")
+
+        image_data = None
+        if image_file_path:
+            with open(image_file_path, "rb") as image_file:
+                image_data = f"data:image/jpeg;base64,{base64.b64encode(image_file.read()).decode("utf-8")}"
+        elif image_file_url:
+            image_data = image_file_url
+
         try:
             messages = []
 
             if system_message:
                 messages.append({"role": "system", "content": system_message})
 
-            messages.append({"role": "user", "content": prompt})
+            user_message = {"role": "user", "content": [
+                {"type": "text", "text": prompt},
+            ]}
 
-            response = self._client.chat.completions.create(
+            if image_data:
+                user_message["content"].append({
+                    "type": "image_url",
+                    "image_url": {"url": image_data},
+                })
+            messages.append(user_message)
+
+            # Log the constructed message payload
+            # logger.debug(f"Constructed messages payload: {messages}")
+
+            response = self._client.beta.chat.completions.parse(
                 model=model_name if model_name else self._model_name,
                 messages=messages,
                 temperature=temperature,
-                response_format={"type": "json_schema", "json_schema": josn_schema}
+                response_format=response_format
             )
-            logger.info(f"Received response for question: {prompt}")
-            return response.choices[0].message.content
+
+            message = response.choices[0].message
+            if message.parsed:
+                # Log the response metadata
+                logger.info(f"Received response from OpenAI: {message.parsed}")
+                return message.parsed
+            else:
+                logger.error(f"{message.refusal}")
+
         except Exception as e:
-            logger.error(f"Error asking question: {prompt}: {e}", exc_info=True)
+            logger.error(f"Error while sending prompt to OpenAI. Prompt: {prompt}, Error: {e}", exc_info=True)
             raise
 
     def generate_image(self, prompt: str, model_name: str = "dall-e-3") -> str:
