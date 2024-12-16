@@ -1,3 +1,4 @@
+import csv
 import os
 import pickle
 import re
@@ -192,3 +193,13 @@ def add_suffix(image_path: str, suffix: str) -> str:
     """
     base, ext = image_path.rsplit('.', 1)  # Split into base and extension
     return f"{base}{suffix}.{ext}"
+
+# Function to read data from a CSV file
+def read_csv(file_path):
+    data = []
+    with open(file_path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            # Join the values into a comma-separated string
+            data.append(",".join(row))
+    return data
