@@ -1,13 +1,13 @@
 from env import S01E01_WEBSITE_URL, S01E01_USERNAME, S01E01_PASSWORD
 from logger import logger
 from openai_client import OpenAIClient
-from playwright_script import PlaywrightScript
+from playwright_script import PlaywrightWeb
 from utils import extract_human_readable_text
 from web_scraper import WebScraper
 
 openai_client = OpenAIClient()
 web_scraper = WebScraper()
-playwright_script = PlaywrightScript(url=S01E01_WEBSITE_URL)
+playwright_script = PlaywrightWeb(url=S01E01_WEBSITE_URL)
 playwright_script.start_browser()
 playwright_script.navigate_to_url()
 

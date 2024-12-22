@@ -5,7 +5,7 @@ from playwright.sync_api import Page, Browser, Playwright
 from playwright.sync_api import sync_playwright
 
 
-class PlaywrightScript:
+class PlaywrightWeb:
 
     @property
     def url(self):

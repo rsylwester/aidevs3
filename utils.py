@@ -1,9 +1,10 @@
 import csv
+import json
 import os
 import pickle
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import pyzipper
 from bs4 import BeautifulSoup
@@ -194,6 +195,7 @@ def add_suffix(image_path: str, suffix: str) -> str:
     base, ext = image_path.rsplit('.', 1)  # Split into base and extension
     return f"{base}{suffix}.{ext}"
 
+
 # Function to read data from a CSV file
 def read_csv(file_path):
     data = []
@@ -202,4 +204,10 @@ def read_csv(file_path):
         for row in reader:
             # Join the values into a comma-separated string
             data.append(",".join(row))
+    return data
+
+
+def read_json(file_path) -> Dict:
+    with open(file_path, 'r', encoding='utf-8') as json_file:
+        data = json.load(json_file)  # Parse JSON file into a dictionary
     return data
