@@ -10,7 +10,7 @@ from env import S03E04_URL_BARBARA_TXT
 from logger import logger
 from s03e04.s03e04_lib import extract_places_names, query_places_api, extract_peoples_names, query_people_api, \
     is_barbara_on_the_list
-from utils import get_filename_from_url, does_file_exist
+from utils import get_filename_from_url, is_file_exist
 
 DATA_DIR = "./data"
 STORAGE_PICKLE = "./data/storage.pickle"
@@ -41,7 +41,7 @@ class Storage:
     @staticmethod
     def deserialize(filepath: str):
         """Deserialize the object from a file."""
-        if does_file_exist(filepath):
+        if is_file_exist(filepath):
             with open(filepath, 'rb') as file:
                 return pickle.load(file)
         return None
@@ -56,7 +56,7 @@ storage = Storage() if storage is None else storage
 
 if storage.is_empty():
 
-    if not utils.does_directory_exist(DATA_DIR) or utils.is_directory_empty(DATA_DIR):
+    if not utils.is_directory_exist(DATA_DIR) or utils.is_directory_empty(DATA_DIR):
         download_utils.download_file(S03E04_URL_BARBARA_TXT, DATA_DIR)
 
     barbara_info = utils.read_text_file(Path(DATA_DIR).joinpath(get_filename_from_url(S03E04_URL_BARBARA_TXT)))

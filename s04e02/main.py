@@ -6,7 +6,7 @@ from utils import read_csv
 
 openai_client = OpenAIClient()
 
-if not utils.does_file_exist(classification_jsonl_file):
+if not utils.is_file_exist(classification_jsonl_file):
     generate_training_jsonl_data()
 
 csv_data = read_csv(verify_data_file)

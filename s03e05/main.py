@@ -3,7 +3,7 @@ import csv
 from aidevs3 import send_answer, Answer
 from logger import logger
 from s03e05.s03e05_lib import query_api, save_relations_to_csv_file, Neo4jHandler
-from utils import does_file_exist
+from utils import is_file_exist
 
 # select relations
 SELECT_USERS = '''
@@ -42,7 +42,7 @@ def read_csv_and_import_to_neo4j(csv_path):
 DATA_DIR = './data'
 RELATIONS_CSF_FILE = './data/relations.csv'
 
-if not does_file_exist(RELATIONS_CSF_FILE):
+if not is_file_exist(RELATIONS_CSF_FILE):
     relations: dict = query_api("database", SELECT_USERS)['reply']
     save_relations_to_csv_file(relations, RELATIONS_CSF_FILE)
 

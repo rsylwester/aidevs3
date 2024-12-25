@@ -93,7 +93,7 @@ def deserialize(filepath=None):
     # Read from file and deserialize
     filepath = filepath if filepath else SERIALIZED_FILENAME
 
-    if does_file_exist(filepath):
+    if is_file_exist(filepath):
         with open(filepath, 'rb') as f:
             loaded_object = pickle.load(f)
             return loaded_object
@@ -146,7 +146,7 @@ def is_directory_empty(directory_path: str) -> bool:
     return True
 
 
-def does_directory_exist(directory_path: str) -> bool:
+def is_directory_exist(directory_path: str) -> bool:
     """
     Checks if a directory exists.
 
@@ -156,7 +156,7 @@ def does_directory_exist(directory_path: str) -> bool:
     return Path(directory_path).is_dir()
 
 
-def does_file_exist(file_path: str) -> bool:
+def is_file_exist(file_path: str) -> bool:
     """
     Checks if a file exists.
 
