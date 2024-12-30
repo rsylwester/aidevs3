@@ -282,3 +282,5 @@ yarl==1.18.0
 html2text==2024.2.26
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+uvicorn==0.34.0
+fastapi
